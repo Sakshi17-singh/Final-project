@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import Navbar from "../components/Navbar"; // ✅ This line is required
+import Navbar from "../components/Navbar"; 
 import "../App.css";
 
 const Login = () => {
@@ -8,10 +8,31 @@ const Login = () => {
 
   const handleChange = (e) => setFormValues({ ...formValues, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert("Login functionality not implemented yet!");
-  };
+  cconst handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formValues),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert(data.message); // successful login
+      setFormValues({ email: "", password: "" });
+    } else {
+      alert(data.detail || "Login failed!"); // backend error
+    }
+  } catch (err) {
+    alert("Error connecting to server!");
+    console.error(err);
+  }
+};
 
   return (
     <>

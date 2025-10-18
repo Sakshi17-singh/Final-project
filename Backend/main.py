@@ -30,14 +30,18 @@ CREATE TABLE IF NOT EXISTS users (
 """)
 conn.commit()
 
-# Pydantic model
+# Pydantic models
 class UserCreate(BaseModel):
     username: str
     email: EmailStr
     mobile: str
     password: str
 
-# Signup endpoint
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+# --- Signup endpoint ---
 @app.post("/signup")
 def create_user(user: UserCreate):
     hashed_password = bcrypt.hash(user.password)
@@ -51,6 +55,22 @@ def create_user(user: UserCreate):
         return {"message": "User created successfully"}
     except sqlite3.IntegrityError:
         raise HTTPException(status_code=400, detail="Username or email already exists")
+
+# --- Login endpoint ---
+@app.post("/login")
+def login_user(user: UserLogin):
+    cursor.execute("SELECT password FROM users WHERE email = ?", (user.email,))
+    row = cursor.fetchone()
+
+    if row is None:
+        raise HTTPException(status_code=400, detail="Email not found")
+
+    stored_hashed_password = row[0]
+
+    if not bcrypt.verify(user.password, stored_hashed_password):
+        raise HTTPException(status_code=400, detail="Incorrect password")
+
+    return {"message": "Login successful"}
 
 # Test endpoint
 @app.get("/")
