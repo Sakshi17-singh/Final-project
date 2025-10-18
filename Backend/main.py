@@ -1,12 +1,12 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, EmailStr
-from passlib.hash import bcrypt
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, EmailStr
 import sqlite3
+from passlib.hash import bcrypt  # ✅ use passlib instead of standalone bcrypt
 
 app = FastAPI()
 
-# CORS for React frontend
+# CORS settings
 origins = ["http://localhost:3000"]
 app.add_middleware(
     CORSMiddleware,
@@ -16,7 +16,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Database setup
+# Database
 conn = sqlite3.connect("users.db", check_same_thread=False)
 cursor = conn.cursor()
 cursor.execute("""
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS users (
 """)
 conn.commit()
 
-# Pydantic models
+# Models
 class UserCreate(BaseModel):
     username: str
     email: EmailStr
@@ -41,11 +41,10 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
-# --- Signup endpoint ---
+# Signup endpoint
 @app.post("/signup")
-def create_user(user: UserCreate):
-    hashed_password = bcrypt.hash(user.password)
-
+def signup(user: UserCreate):
+    hashed_password = bcrypt.hash(user.password)  # ✅ hash password
     try:
         cursor.execute(
             "INSERT INTO users (username, email, mobile, password) VALUES (?, ?, ?, ?)",
@@ -56,23 +55,21 @@ def create_user(user: UserCreate):
     except sqlite3.IntegrityError:
         raise HTTPException(status_code=400, detail="Username or email already exists")
 
-# --- Login endpoint ---
+# Login endpoint
 @app.post("/login")
-def login_user(user: UserLogin):
+def login(user: UserLogin):
     cursor.execute("SELECT password FROM users WHERE email = ?", (user.email,))
     row = cursor.fetchone()
-
     if row is None:
         raise HTTPException(status_code=400, detail="Email not found")
 
-    stored_hashed_password = row[0]
+    stored_password = row[0]
 
-    if not bcrypt.verify(user.password, stored_hashed_password):
+    if not bcrypt.verify(user.password, stored_password):  # ✅ verify password
         raise HTTPException(status_code=400, detail="Incorrect password")
 
     return {"message": "Login successful"}
 
-# Test endpoint
 @app.get("/")
-def read_root():
+def root():
     return {"message": "Server is running"}

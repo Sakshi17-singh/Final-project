@@ -4,10 +4,10 @@ import "../App.css";
 
 const Signup = () => {
   const [formValues, setFormValues] = useState({
-    username: '',
-    email: '',
-    mobile: '',
-    password: '',
+    username: "",
+    email: "",
+    mobile: "",
+    password: "",
   });
 
   const [formErrors, setFormErrors] = useState({});
@@ -43,23 +43,40 @@ const Signup = () => {
     return errors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validateForm();
-    console.log("Validation Errors:", errors);
+    setFormErrors(errors);
 
     if (Object.keys(errors).length === 0) {
-      alert("Form submitted successfully!");
-      console.log("Form Values:", formValues);
+      try {
+        const response = await fetch("http://127.0.0.1:8000/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formValues),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert(data.message || "Signup successful!");
+          setFormValues({ username: "", email: "", mobile: "", password: "" });
+        } else {
+          alert(data.detail || "Signup failed!");
+        }
+      } catch (err) {
+        alert("Error connecting to server!");
+        console.error(err);
+      }
     } else {
       alert("Form submission failed — please fix the errors!");
-      setFormErrors(errors);
     }
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormValues({ ...formValues, [name]: value });
+    setFormErrors({ ...formErrors, [name]: "" }); // clear error on typing
   };
 
   return (
