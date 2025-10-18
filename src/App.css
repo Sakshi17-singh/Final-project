@@ -145,7 +145,7 @@ p {
 }
 
 .navbar .logo a {
-   font-family: 'Quicksand', sans-serif;
+   font-family: 'Nunito', sans-serif;
   font-weight: 700;
   font-size: 26px;
   color: #da360d;
@@ -182,3 +182,134 @@ p {
 body {
   padding-top: 60px; /* same as navbar height */
 }
+/* 🌍 Hero Section */
+.hero-section {
+  text-align: center;
+  padding: 120px 20px;
+  color: white;
+  background: linear-gradient(135deg, #a069da, #3a82b4);
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hero-section h1 {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.hero-section p {
+  font-size: 18px;
+  margin-bottom: 25px;
+}
+
+.cta-btn {
+  padding: 12px 25px;
+  background: rgba(255, 255, 255, 0.3);
+  border: 2px solid white;
+  color: white;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.cta-btn:hover {
+  background: white;
+  color: #3a82b4;
+}
+
+/* ✨ Event Section */
+.event-section {
+  text-align: center;
+  padding: 100px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.event-section h2 {
+  color: #fff;
+  font-size: 32px;
+  margin-bottom: 15px;
+}
+
+.event-section p {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.event-cta-btn {
+  padding: 10px 22px;
+  border-radius: 10px;
+  background: linear-gradient(45deg, #ff6a00, #ee0979);
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.event-cta-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+}
+
+/* 🪞 Framed Section Styling for About & Contact */
+.framed-section {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  margin: 80px auto;
+  padding: 50px 40px;
+  max-width: 800px;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: fadeUp 1s ease-in;
+}
+
+.framed-section h2 {
+  font-size: 32px;
+  margin-bottom: 15px;
+  color: #ffeaa7;
+}
+
+.framed-section p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ✨ Smooth scroll animation */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 📱 Responsive Design */
+@media (max-width: 768px) {
+  .framed-section {
+    padding: 30px 20px;
+    margin: 40px 15px;
+  }
+
+  .hero-section h1 {
+    font-size: 36px;
+  }
+
+  .framed-section h2 {
+    font-size: 26px;
+  }
+}
+
