@@ -1,26 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "../App.css"; // make sure you have styling
+import "../App.css";
 
 function Home() {
   return (
     <div className="main">
-      {/* Hero / Welcome Section */}
+      {/* Hero Section */}
       <section id="hero" className="hero-section">
-        <h1>Welcome to TravelApp</h1>
-        <p>Explore the world with us!</p>
+        <h1>Welcome to Roamio-Wanderly</h1>
+        <p>Explore our Nepal with us!</p>
         <Link to="/signup" className="cta-btn">
           Get Started
         </Link>
-      </section>
-
-      {/* About Us Section */}
-      <section id="about-us" className="about-section">
-        <h2>About Us</h2>
-        <p>
-          TravelApp is your ultimate travel companion. Discover amazing
-          destinations, plan trips, and experience the world like never before.
-        </p>
       </section>
 
       {/* Events Section */}
@@ -34,12 +25,21 @@ function Home() {
         </Link>
       </section>
 
+      {/* About Us Section */}
+      <section id="about-us" className="about-section framed-section">
+        <h2>About Us</h2>
+        <p>
+         Roamio-Wanderly is your ultimate travel companion. Discover amazing
+          destinations, plan trips, and experience the world like never before.
+        </p>
+      </section>
+
       {/* Contact Us Section */}
-      <section id="contact-us" className="contact-section">
+      <section id="contact-us" className="contact-section framed-section">
         <h2>Contact Us</h2>
-        <p>Email: info@travelapp.com</p>
-        <p>Phone: +123 456 7890</p>
-        <p>Address: 123 Travel Street, Adventure City</p>
+        <p>Email: info@ramiowanderlytravel.com</p>
+        <p>Phone: 9861402251</p>
+        <p>Address: Kathmandu, Nepal</p>
       </section>
     </div>
   );
