@@ -1,11 +1,12 @@
 import './App.css';
-import Home from './Pages/Home';
-import About from './Pages/About'; 
+import Home from './Pages/Home'; 
 import NotFound from './Pages/NotFound';
 import Signup from './Pages/Signup';
 import Login from './Pages/Login';
 import Admin from './Pages/Admin';
 import Navbar from './components/Navbar'; 
+import ForgotPassword from './Pages/ForgotPassword';
+import VerifyOTP from './Pages/VerifyOTP';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
@@ -22,8 +23,8 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-          {/* If you want separate About page remove below */}
-          {/* <Route path="/about" element={<About />} /> */}
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/verify-otp" element={<VerifyOTP />} />
           <Route path="/admin" element={isAdmin ? <Admin /> : <Navigate to="/home" />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
