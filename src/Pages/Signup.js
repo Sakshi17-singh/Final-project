@@ -4,20 +4,21 @@ import "../App.css";
 
 const Signup = () => {
   const [formValues, setFormValues] = useState({
-    username: '',
-    email: '',
-    mobile: '',
-    password: '',
+    username: "",
+    email: "",
+    mobile: "",
+    password: "",
   });
 
   const [formErrors, setFormErrors] = useState({});
 
+  // --- Validation function ---
   const validateForm = () => {
     const errors = {};
 
     if (!formValues.username) {
       errors.username = "Username is required";
-    } else if (!/^[A-Za-z0-9_]{3,15}$/.test(formValues.username)) {
+    } else if (!/^[A-Za-z0-9_ ]{3,15}$/.test(formValues.username)) {
       errors.username =
         "Username should be 3-15 characters long and can only contain letters, numbers, and underscores.";
     }
@@ -25,7 +26,7 @@ const Signup = () => {
     if (!formValues.email) {
       errors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formValues.email)) {
-      errors.email = "Email address is invalid";
+      errors.email = "Invalid email address";
     }
 
     if (!formValues.mobile) {
@@ -43,17 +44,44 @@ const Signup = () => {
     return errors;
   };
 
-  const handleSubmit = (e) => {
+  // --- Handle form submission ---
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validateForm();
-    console.log("Validation Errors:", errors);
 
-    if (Object.keys(errors).length === 0) {
-      alert("Form submitted successfully!");
-      console.log("Form Values:", formValues);
-    } else {
-      alert("Form submission failed — please fix the errors!");
+    if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
+      alert("Form submission failed — please fix the errors!");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: formValues.username,
+          email: formValues.email,
+          mobile: formValues.mobile,
+          password: formValues.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(`Signup failed: ${data.detail || "Unknown error"}`);
+        return;
+      }
+
+      alert("Signup successful!");
+      console.log("User created:", data);
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Error during signup:", error);
+      alert("Something went wrong. Please try again later.");
     }
   };
 

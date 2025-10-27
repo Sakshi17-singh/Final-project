@@ -1,13 +1,16 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, EmailStr
-from passlib.hash import bcrypt
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import sqlite3
+import bcrypt
 
 app = FastAPI()
 
-# CORS for React frontend
-origins = ["http://localhost:3000"]
+# --- CORS ---
+origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000"
+]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -16,63 +19,57 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Database setup
-conn = sqlite3.connect("users.db", check_same_thread=False)
-cursor = conn.cursor()
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE,
-    email TEXT UNIQUE,
-    mobile TEXT,
-    password TEXT
-)
-""")
-conn.commit()
+# --- Database Setup ---
+def get_db_connection():
+    conn = sqlite3.connect("users.db")
+    conn.row_factory = sqlite3.Row
+    return conn
 
-# Pydantic models
-class UserCreate(BaseModel):
+# --- Models ---
+class SignupData(BaseModel):
     username: str
-    email: EmailStr
+    email: str
     mobile: str
     password: str
 
-class UserLogin(BaseModel):
-    email: EmailStr
+class LoginData(BaseModel):
+    email: str
     password: str
 
-# --- Signup endpoint ---
+# --- Routes ---
 @app.post("/signup")
-def create_user(user: UserCreate):
-    hashed_password = bcrypt.hash(user.password)
+def signup(data: SignupData):
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-    try:
-        cursor.execute(
-            "INSERT INTO users (username, email, mobile, password) VALUES (?, ?, ?, ?)",
-            (user.username, user.email, user.mobile, hashed_password)
-        )
-        conn.commit()
-        return {"message": "User created successfully"}
-    except sqlite3.IntegrityError:
-        raise HTTPException(status_code=400, detail="Username or email already exists")
+    cursor.execute("SELECT * FROM users WHERE email = ?", (data.email,))
+    existing_user = cursor.fetchone()
+    if existing_user:
+        conn.close()
+        raise HTTPException(status_code=400, detail="Email already exists")
 
-# --- Login endpoint ---
+    hashed_pw = bcrypt.hashpw(data.password.encode('utf-8'), bcrypt.gensalt())
+    cursor.execute(
+        "INSERT INTO users (username, email, mobile, password) VALUES (?, ?, ?, ?)",
+        (data.username, data.email, data.mobile, hashed_pw)
+    )
+    conn.commit()
+    conn.close()
+    return {"message": "User registered successfully"}
+
 @app.post("/login")
-def login_user(user: UserLogin):
-    cursor.execute("SELECT password FROM users WHERE email = ?", (user.email,))
-    row = cursor.fetchone()
+def login(data: LoginData):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE email = ?", (data.email,))
+    user = cursor.fetchone()
+    conn.close()
 
-    if row is None:
-        raise HTTPException(status_code=400, detail="Email not found")
+    if not user:
+        raise HTTPException(status_code=404, detail="Email not found")
 
-    stored_hashed_password = row[0]
-
-    if not bcrypt.verify(user.password, stored_hashed_password):
-        raise HTTPException(status_code=400, detail="Incorrect password")
+    stored_password = user["password"]
+    if not bcrypt.checkpw(data.password.encode("utf-8"), stored_password):
+        raise HTTPException(status_code=401, detail="Invalid password")
 
     return {"message": "Login successful"}
-
-# Test endpoint
-@app.get("/")
-def read_root():
-    return {"message": "Server is running"}
